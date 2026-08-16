@@ -4,17 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Menu Principal - Formulaires</title>
+
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f6f8;
       padding: 20px;
     }
+
     .container {
       max-width: 500px;
       margin: 40px auto;
@@ -23,17 +26,20 @@
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
+
     h1 {
       text-align: center;
       color: #1e293b;
       font-size: 24px;
       margin-bottom: 25px;
     }
+
     .menu-grid {
       display: flex;
       flex-direction: column;
       gap: 15px;
     }
+
     .btn-menu {
       display: block;
       width: 100%;
@@ -48,33 +54,46 @@
       transition: background-color 0.2s ease, transform 0.1s ease;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
+
     .btn-menu:hover {
       background-color: #0369a1;
       transform: translateY(-1px);
     }
+
     .btn-excel {
-      background-color: #15803d; /* Vert distinct distinct pour le fichier Excel */
+      background-color: #15803d;
     }
+
     .btn-excel:hover {
       background-color: #166534;
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
     <h1>Menu Principal</h1>
-    
+
     <nav class="menu-grid">
-      <a href="Fin.html" class="btn-menu">Rapport fin de quart</a>
-      <a href="inventaire.html" class="btn-menu">Inventaire dépôt</a>
-      <a href="weekend.html" class="btn-menu">Tournée week-end</a>
-     <a href="https://github.com/martinlefebvre73-bit/Alizea/raw/main/verification%20tourn%C3%A9es%20(PAB%20%2B%20Entretien).xlsx"
-   target="_blank"
-   rel="noopener noreferrer"
-   class="btn-menu btn-excel">
-   Toutes les tournées (Excel)
-</a>
+      <a href="Fin.html" class="btn-menu">
+        Rapport fin de quart
+      </a>
+
+      <a href="inventaire.html" class="btn-menu">
+        Inventaire dépôt
+      </a>
+
+      <a href="weekend.html" class="btn-menu">
+        Tournée week-end
+      </a>
+
+      <a href="https://github.com/martinlefebvre73-bit/Alizea/raw/main/verification%20tourn%C3%A9es%20(PAB%20%2B%20Entretien).xlsx"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="btn-menu btn-excel">
+        Toutes les tournées (Excel)
+      </a>
     </nav>
   </div>
 
