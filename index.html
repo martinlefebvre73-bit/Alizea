@@ -13,10 +13,17 @@ button:hover,a.menu-btn:hover{background:#005ea6}
 .hidden{display:none}
 .back{background:#666}
 .back:hover{background:#444}
+.voice-btn{background:#28a745;margin-bottom:20px}
+.voice-btn.listening{background:#dc3545;animation:pulse 1.5s infinite}
+@keyframes pulse{0%{opacity:1}50%{opacity:0.6}100%{opacity:1}}
+#status{font-size:14px;color:#555;margin-bottom:10px;min-height:20px}
 </style>
 </head>
 <body>
 <div class="menu">
+
+<button id="micBtn" class="voice-btn" onclick="toggleSpeech()">Activer la dictée vocale</button>
+<div id="status"></div>
 
 <div id="mainMenu">
 <h1>Menu Principal</h1>
@@ -47,10 +54,77 @@ button:hover,a.menu-btn:hover{background:#005ea6}
 </div>
 
 </div>
+
 <script>
 function showMenu(id){
   document.querySelectorAll('.menu > div').forEach(el=>el.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
+}
+
+// Configuration de la reconnaissance vocale
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'fr-FR';
+  recognition.continuous = true;
+  recognition.interimResults = false;
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+    document.getElementById('status').textContent = 'Entendu : "' + transcript + '"';
+
+    if (transcript.includes('administration') || transcript.includes('admin')) {
+      showMenu('adminMenu');
+    } else if (transcript.includes('soin') || transcript.includes('infirmier')) {
+      showMenu('soinsMenu');
+    } else if (transcript.includes('maintenance')) {
+      showMenu('maintenanceMenu');
+    } else if (transcript.includes('retour') || transcript.includes('principal') || transcript.includes('accueil')) {
+      showMenu('mainMenu');
+    }
+  };
+
+  recognition.onerror = (e) => {
+    document.getElementById('status').textContent = 'Erreur ou micro bloqué.';
+    stopListening();
+  };
+
+  recognition.onend = () => {
+    if (isListening) recognition.start(); // Relance auto si toujours actif
+  };
+} else {
+  document.getElementById('micBtn').disabled = true;
+  document.getElementById('status').textContent = 'Dictée vocale non supportée par ce navigateur.';
+}
+
+function toggleSpeech() {
+  if (!recognition) return;
+  if (isListening) {
+    stopListening();
+  } else {
+    startListening();
+  }
+}
+
+function startListening() {
+  isListening = true;
+  recognition.start();
+  const btn = document.getElementById('micBtn');
+  btn.textContent = 'Écoute en cours... (Cliquer pour stopper)';
+  btn.classList.add('listening');
+  document.getElementById('status').textContent = 'Parlez maintenant...';
+}
+
+function stopListening() {
+  isListening = false;
+  if (recognition) recognition.stop();
+  const btn = document.getElementById('micBtn');
+  btn.textContent = 'Activer la dictée vocale';
+  btn.classList.remove('listening');
+  document.getElementById('status').textContent = '';
 }
 </script>
 </body>
