@@ -8,6 +8,8 @@
         :root {
             --primary-color: #2c3e50;
             --accent-color: #27ae60;
+            --secondary-color: #2980b9;
+            --print-color: #8e44ad;
             --bg-color: #f8f9fa;
             --card-bg: #ffffff;
             --border-color: #e2e8f0;
@@ -65,13 +67,7 @@
             border: 1px solid #cbd5e0;
         }
 
-        nav a:hover {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        nav a.active {
+        nav a:hover, nav a.active {
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
@@ -242,19 +238,129 @@
             min-width: 250px;
         }
 
-        .btn-reset {
-            background: #718096;
-            color: white;
+        .actions-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
             border: none;
-            padding: 10px 20px;
+            padding: 10px 18px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             transition: background 0.2s;
+            color: white;
+        }
+
+        .btn-save {
+            background: var(--accent-color);
+        }
+
+        .btn-save:hover {
+            background: #219150;
+        }
+
+        .btn-load {
+            background: var(--secondary-color);
+        }
+
+        .btn-load:hover {
+            background: #1f618d;
+        }
+
+        .btn-print {
+            background: var(--print-color);
+        }
+
+        .btn-print:hover {
+            background: #763e9b;
+        }
+
+        .btn-action:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: #718096;
+            color: white;
         }
 
         .btn-reset:hover {
             background: #4a5568;
+        }
+
+        /* Modal / Pop-up de recherche */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .modal-field {
+            margin-bottom: 15px;
+        }
+
+        .modal-field label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .modal-field input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        @media print {
+            nav, .mic-btn, .actions-group, .modal-overlay {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .comment-input, .meta-field input, .signature-box input {
+                border: none;
+                border-bottom: 1px solid #000;
+                background: transparent;
+            }
         }
     </style>
 </head>
@@ -262,14 +368,14 @@
 
 <div class="container">
     <header>
-        <h1> verification tournées (PAB + Entretien)</h1>
+        <h1>Vérification tournées (PAB + Entretien)</h1>
         <nav>
             <a href="pab_soir.html">Entretien PAB (Soir)</a>
-<a href="pab_nuit.html">Entretien PAB (Nuit)</a>
-<a href="entretien_salle_a_manger.html">Entretien - Salle à manger</a>
-<a href="pab_ronde_sec.html" class="active">Ronde de Sécurité PAB</a>
-<a href="entretien_soir.html">Entretien Soir</a>
-<a href="entretien_nuit.html">Entretien Nuit</a>
+            <a href="pab_nuit.html">Entretien PAB (Nuit)</a>
+            <a href="entretien_salle_a_manger.html">Entretien - Salle à manger</a>
+            <a href="pab_ronde_sec.html" class="active">Ronde de Sécurité PAB</a>
+            <a href="entretien_soir.html">Entretien Soir</a>
+            <a href="entretien_nuit.html">Entretien Nuit</a>
         </nav>
     </header>
 
@@ -297,267 +403,227 @@
                 <th class="col-comment">Commentaire (Dictée vocale 🎤)</th>
             </tr>
         </thead>
-        <tbody>
-            
-        <tr>
-            <td class="col-num">1</td>
-            <td class="col-task">Côté appt 609</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-1" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-1')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">2</td>
-            <td class="col-task">Devant apt 621</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-2" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-2')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">3</td>
-            <td class="col-task">6e étage devant ascensseur phase 2</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-3" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-3')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">4</td>
-            <td class="col-task">Coté apt 509</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-4" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-4')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">5</td>
-            <td class="col-task">Devant apt 521</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-5" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-5')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">6</td>
-            <td class="col-task">5e étage devant ascensseur phase 2</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-6" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-6')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">7</td>
-            <td class="col-task">Côté appt 409</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-7" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-7')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">8</td>
-            <td class="col-task">Devant apt 421</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-8" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-8')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">9</td>
-            <td class="col-task">4e étage devant ascensseur phase 2</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-9" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-9')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">10</td>
-            <td class="col-task">Côté appt 309</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-10" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-10')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">11</td>
-            <td class="col-task">Devant apt 321</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-11" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-11')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">12</td>
-            <td class="col-task">3e étage devant ascensseur phase 2</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-12" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-12')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">13</td>
-            <td class="col-task">Coté apt 209</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-13" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-13')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">14</td>
-            <td class="col-task">Bibliotheque (mazzanine)</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-14" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-14')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">15</td>
-            <td class="col-task">Devant apt 221</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-15" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-15')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">16</td>
-            <td class="col-task">2e étage devant ascensseur phase 2</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-16" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-16')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">17</td>
-            <td class="col-task">Portes de sorties (5) Sous-sol</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-17" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-17')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">18</td>
-            <td class="col-task">atelier</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-18" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-18')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">19</td>
-            <td class="col-task">centre garage</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-19" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-19')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
-
-        <tr>
-            <td class="col-num">20</td>
-            <td class="col-task">Sous-sol ascenseur phase 2</td>
-            <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
-            <td class="col-comment">
-                <div class="comment-container">
-                    <input type="text" id="comment-20" class="comment-input" placeholder="Ajouter un commentaire...">
-                    <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-20')" title="Activer la dictée vocale">🎤</button>
-                </div>
-            </td>
-        </tr>
-        
+        <tbody id="task-table-body">
+            <tr data-num="1">
+                <td class="col-num">1</td>
+                <td class="col-task">Côté appt 609</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-1" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-1')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="2">
+                <td class="col-num">2</td>
+                <td class="col-task">Devant apt 621</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-2" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-2')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="3">
+                <td class="col-num">3</td>
+                <td class="col-task">6e étage devant ascensseur phase 2</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-3" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-3')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="4">
+                <td class="col-num">4</td>
+                <td class="col-task">Coté apt 509</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-4" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-4')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="5">
+                <td class="col-num">5</td>
+                <td class="col-task">Devant apt 521</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-5" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-5')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="6">
+                <td class="col-num">6</td>
+                <td class="col-task">5e étage devant ascensseur phase 2</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-6" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-6')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="7">
+                <td class="col-num">7</td>
+                <td class="col-task">Côté appt 409</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-7" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-7')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="8">
+                <td class="col-num">8</td>
+                <td class="col-task">Devant apt 421</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-8" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-8')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="9">
+                <td class="col-num">9</td>
+                <td class="col-task">4e étage devant ascensseur phase 2</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-9" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-9')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="10">
+                <td class="col-num">10</td>
+                <td class="col-task">Côté appt 309</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-10" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-10')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="11">
+                <td class="col-num">11</td>
+                <td class="col-task">Devant apt 321</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-11" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-11')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="12">
+                <td class="col-num">12</td>
+                <td class="col-task">3e étage devant ascensseur phase 2</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-12" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-12')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="13">
+                <td class="col-num">13</td>
+                <td class="col-task">Coté apt 209</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-13" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-13')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="14">
+                <td class="col-num">14</td>
+                <td class="col-task">Bibliotheque (mazzanine)</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-14" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-14')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="15">
+                <td class="col-num">15</td>
+                <td class="col-task">Devant apt 221</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-15" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-15')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="16">
+                <td class="col-num">16</td>
+                <td class="col-task">2e étage devant ascensseur phase 2</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-16" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-16')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="17">
+                <td class="col-num">17</td>
+                <td class="col-task">Portes de sorties (5) Sous-sol</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-17" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-17')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="18">
+                <td class="col-num">18</td>
+                <td class="col-task">atelier</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-18" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-18')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="19">
+                <td class="col-num">19</td>
+                <td class="col-task">centre garage</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-19" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-19')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
+            <tr data-num="20">
+                <td class="col-num">20</td>
+                <td class="col-task">Sous-sol ascenseur phase 2</td>
+                <td class="col-fait"><input type="checkbox" class="checkbox-custom"></td>
+                <td class="col-comment">
+                    <div class="comment-container">
+                        <input type="text" id="comment-20" class="comment-input" placeholder="Ajouter un commentaire...">
+                        <button type="button" class="mic-btn" onclick="toggleDictation(this, 'comment-20')" title="Activer la dictée vocale">🎤</button>
+                    </div>
+                </td>
+            </tr>
         </tbody>
     </table>
 
@@ -566,12 +632,192 @@
             <label for="signature-input"><strong>Signature / Validation :</strong></label>
             <input type="text" id="signature-input" placeholder="Signature de l'agent">
         </div>
-        <button class="btn-reset" onclick="resetForm()">Réinitialiser le formulaire</button>
+        <div class="actions-group">
+            <button class="btn-action btn-save" id="btn-save" onclick="saveToFirebase()">Enregistrer dans Firebase</button>
+            <button class="btn-action btn-load" id="btn-load" onclick="openSearchModal()">Charger depuis Firebase</button>
+            <button class="btn-action btn-print" onclick="window.print()">🖨️ Imprimer / PDF</button>
+            <button class="btn-action btn-reset" onclick="resetForm()">Réinitialiser</button>
+        </div>
     </div>
 </div>
 
+<!-- Pop-up de Recherche Firebase -->
+<div class="modal-overlay" id="searchModal">
+    <div class="modal-card">
+        <h3>Rechercher un rapport</h3>
+        
+        <div class="modal-field">
+            <label for="search-date">Filtrer par date :</label>
+            <input type="date" id="search-date">
+        </div>
+
+        <div class="modal-field">
+            <label for="search-keyword">Recherche par mot-clé (Nom, agent, etc.) :</label>
+            <input type="text" id="search-keyword" placeholder="Ex: Martin, ronde...">
+        </div>
+
+        <div class="modal-buttons">
+            <button class="btn-action btn-reset" onclick="closeSearchModal()">Annuler</button>
+            <button class="btn-action btn-load" onclick="executeFirebaseSearch()">Rechercher</button>
+        </div>
+    </div>
+</div>
+
+<!-- SDK Firebase via modules ESM -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyASNjEZ9tyR7VzHycAPJ65BeTuh6baOWYc",
+        authDomain: "alizea-26f19.firebaseapp.com",
+        projectId: "alizea-26f19",
+        storageBucket: "alizea-26f19.firebasestorage.app",
+        messagingSenderId: "274553836522",
+        appId: "1:274553836522:web:8271e290e1cbd41fb01893",
+        measurementId: "G-GFVWC7TWJ0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Fenêtre Modal handlers
+    window.openSearchModal = function() {
+        document.getElementById('search-date').value = document.getElementById('date-input').value;
+        document.getElementById('searchModal').style.display = 'flex';
+    };
+
+    window.closeSearchModal = function() {
+        document.getElementById('searchModal').style.display = 'none';
+    };
+
+    // Enregistrement dans la collection 'pab_ronde'
+    window.saveToFirebase = async function() {
+        const btnSave = document.getElementById('btn-save');
+        const agent = document.getElementById('agent-input').value.trim();
+        const date = document.getElementById('date-input').value;
+        const signature = document.getElementById('signature-input').value.trim();
+
+        if (!agent) {
+            alert("Veuillez saisir votre nom ou initiales avant de sauvegarder.");
+            document.getElementById('agent-input').focus();
+            return;
+        }
+
+        const rows = document.querySelectorAll('#task-table-body tr');
+        const tasks = [];
+
+        rows.forEach(row => {
+            const num = row.getAttribute('data-num');
+            const description = row.querySelector('.col-task').innerText.trim();
+            const completed = row.querySelector('.checkbox-custom').checked;
+            const comment = row.querySelector('.comment-input').value.trim();
+
+            tasks.push({
+                num: parseInt(num, 10),
+                description: description,
+                completed: completed,
+                comment: comment
+            });
+        });
+
+        const reportData = {
+            type: "Ronde de Sécurité PAB",
+            date: date,
+            agent: agent,
+            signature: signature,
+            timestamp: serverTimestamp(),
+            tasks: tasks
+        };
+
+        try {
+            btnSave.disabled = true;
+            btnSave.innerText = "Enregistrement en cours...";
+
+            const docRef = await addDoc(collection(db, "pab_ronde"), reportData);
+            alert("Rapport enregistré avec succès dans la collection 'pab_ronde' ! (ID: " + docRef.id + ")");
+        } catch (error) {
+            console.error("Erreur lors de l'enregistrement : ", error);
+            alert("Erreur lors de l'enregistrement : " + error.message);
+        } finally {
+            btnSave.disabled = false;
+            btnSave.innerText = "Enregistrer dans Firebase";
+        }
+    };
+
+    // Recherche et chargement depuis la collection 'pab_ronde'
+    window.executeFirebaseSearch = async function() {
+        const btnLoad = document.getElementById('btn-load');
+        const searchDate = document.getElementById('search-date').value;
+        const searchKeyword = document.getElementById('search-keyword').value.trim().toLowerCase();
+
+        closeSearchModal();
+
+        try {
+            btnLoad.disabled = true;
+            btnLoad.innerText = "Recherche...";
+
+            const collectionRef = collection(db, "pab_ronde");
+            let docsList = [];
+
+            if (searchDate) {
+                const q = query(collectionRef, where("date", "==", searchDate));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach(doc => docsList.push(doc.data()));
+            } else {
+                const q = query(collectionRef, orderBy("timestamp", "desc"), limit(20));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach(doc => docsList.push(doc.data()));
+            }
+
+            if (searchKeyword !== '') {
+                docsList = docsList.filter(data => {
+                    const agentMatch = (data.agent || '').toLowerCase().includes(searchKeyword);
+                    const sigMatch = (data.signature || '').toLowerCase().includes(searchKeyword);
+                    const taskMatch = Array.isArray(data.tasks) && data.tasks.some(t => 
+                        (t.comment || '').toLowerCase().includes(searchKeyword) ||
+                        (t.description || '').toLowerCase().includes(searchKeyword)
+                    );
+                    return agentMatch || sigMatch || taskMatch;
+                });
+            }
+
+            if (docsList.length === 0) {
+                alert("Aucun rapport ne correspond à vos critères de recherche.");
+                return;
+            }
+
+            docsList.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+            const data = docsList[0];
+
+            if (data.date) document.getElementById('date-input').value = data.date;
+            if (data.agent) document.getElementById('agent-input').value = data.agent;
+            if (data.signature) document.getElementById('signature-input').value = data.signature;
+
+            if (Array.isArray(data.tasks)) {
+                data.tasks.forEach(task => {
+                    const row = document.querySelector(`#task-table-body tr[data-num="${task.num}"]`);
+                    if (row) {
+                        const checkbox = row.querySelector('.checkbox-custom');
+                        const commentInput = row.querySelector('.comment-input');
+                        if (checkbox) checkbox.checked = !!task.completed;
+                        if (commentInput) commentInput.value = task.comment || '';
+                    }
+                });
+            }
+
+            alert("Rapport chargé avec succès !");
+        } catch (error) {
+            console.error("Erreur lors du chargement : ", error);
+            alert("Erreur lors du chargement : " + error.message);
+        } finally {
+            btnLoad.disabled = false;
+            btnLoad.innerText = "Charger depuis Firebase";
+        }
+    };
+</script>
+
 <script>
-    // Initialisation de la reconnaissance vocale (SpeechRecognition API)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let currentInput = null;
@@ -580,40 +826,31 @@
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.continuous = false;
-        recognition.lang = 'fr-FR';
+        recognition.lang = 'fr-CA';
         recognition.interimResults = false;
 
         recognition.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
             if (currentInput) {
-                if (currentInput.value) {
-                    currentInput.value += " " + transcript;
-                } else {
-                    currentInput.value = transcript;
-                }
+                currentInput.value = currentInput.value ? currentInput.value + " " + transcript : transcript;
             }
         };
 
         recognition.onend = function() {
-            if (currentBtn) {
-                currentBtn.classList.remove('recording');
-            }
+            if (currentBtn) currentBtn.classList.remove('recording');
             currentInput = null;
             currentBtn = null;
         };
 
         recognition.onerror = function(event) {
-            console.error('Erreur de reconnaissance vocale :', event.error);
-            if (currentBtn) {
-                currentBtn.classList.remove('recording');
-            }
+            if (currentBtn) currentBtn.classList.remove('recording');
             alert("Erreur de dictée vocale : " + event.error);
         };
     }
 
     function toggleDictation(btn, inputId) {
         if (!SpeechRecognition) {
-            alert("La dictée vocale n'est pas supportée par votre navigateur. Veuillez utiliser Chrome, Edge ou Safari.");
+            alert("La dictée vocale n'est pas supportée sur ce navigateur.");
             return;
         }
 
@@ -624,31 +861,24 @@
             return;
         }
 
-        if (currentBtn) {
-            recognition.stop();
-        }
+        if (currentBtn) recognition.stop();
 
         currentInput = input;
         currentBtn = btn;
-
         btn.classList.add('recording');
         recognition.start();
     }
 
     function resetForm() {
         if (confirm("Voulez-vous vraiment réinitialiser toutes les cases et tous les commentaires ?")) {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => cb.checked = false);
-
-            const inputs = document.querySelectorAll('input[type="text"], input[type="date"]');
-            inputs.forEach(input => input.value = '');
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
+            document.getElementById('date-input').value = new Date().toISOString().split('T')[0];
         }
     }
 
-    // Mettre la date d'aujourd'hui par défaut
     document.addEventListener("DOMContentLoaded", function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('date-input').value = today;
+        document.getElementById('date-input').value = new Date().toISOString().split('T')[0];
     });
 </script>
 
