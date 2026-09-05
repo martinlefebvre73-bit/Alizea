@@ -86,10 +86,18 @@ button:hover,a.menu-btn:hover{background:#005ea6}
 <!-- Cuisine -->
 <div id="cuisineMenu" class="hidden">
 <h1>Cuisine</h1>
-<a id="btn-cuisine-repas" class="menu-btn" href="repas.html">Repas</a>
+<button onclick="showMenu('cuisineRepasMenu')">Repas</button>
 <a id="btn-cuisine-commandes" class="menu-btn" href="commandes.html">Commandes</a>
 <button onclick="showMenu('cuisineEntretienMenu')">Entretien</button>
 <button class="back" onclick="showMenu('mainMenu')">Retour</button>
+</div>
+
+<!-- Cuisine > Repas -->
+<div id="cuisineRepasMenu" class="hidden">
+<h1>Repas</h1>
+<a id="btn-cuisine-repas" class="menu-btn" href="repas.html">Menu du jour</a>
+<a id="btn-genere-menu-3sem" class="menu-btn" href="https://docs.google.com/document/d/1_1cUy0zrb3jizz3JsgMQkqmwCmQnqLKiJmFPJHeF2ew/edit?usp=drive_web" target="_blank">Génère menu 3 semaines</a>
+<button class="back" onclick="showMenu('cuisineMenu')">Retour</button>
 </div>
 
 <!-- Cuisine > Entretien -->
@@ -165,7 +173,9 @@ if (SpeechRecognition) {
 
     // Cuisine
     else if (transcript.includes('repas')) {
-      document.getElementById('btn-cuisine-repas').click();
+      showMenu('cuisineRepasMenu');
+    } else if (transcript.includes('menu 3 semaines') || transcript.includes('génère menu')) {
+      document.getElementById('btn-genere-menu-3sem').click();
     } else if (transcript.includes('commande') || transcript.includes('commandes')) {
       document.getElementById('btn-cuisine-commandes').click();
     } else if (transcript.includes('salle à manger') || transcript.includes('salle a manger')) {
