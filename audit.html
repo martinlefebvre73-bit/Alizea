@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Suivi des Tâches d'Entretien</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-light: #3b82f6;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .info-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .btn-mic {
+            background-color: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--text-main);
+            flex-shrink: 0;
+        }
+
+        .btn-mic:hover {
+            background-color: #e2e8f0;
+        }
+
+        .btn-mic.recording {
+            background-color: #ef4444;
+            color: white;
+            border-color: #dc2626;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        .controls-card {
+            background-color: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            background-color: #f1f5f9;
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px 8px 35px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .progress-container {
+            background-color: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-bar-bg {
+            flex-grow: 1;
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            min-width: 120px;
+            text-align: right;
+        }
+
+        .tasks-container {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+            padding: 14px 16px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .badge-resp {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .resp-pab-soir { background-color: #dbeafe; color: #1e40af; }
+        .resp-pab-nuit { background-color: #e0e7ff; color: #3730a3; }
+        .resp-sam { background-color: #fef3c7; color: #92400e; }
+        .resp-entretien-soir { background-color: #dcfce7; color: #166534; }
+        .resp-entretien-nuit { background-color: #ccfbf1; color: #115e59; }
+
+        .checkbox-cell {
+            text-align: center;
+            width: 60px;
+        }
+
+        .checkbox-cell input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+
+        .task-done {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .comment-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-accent {
+            background-color: #0284c7;
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background-color: #0369a1;
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+
+        /* Modal de recherche Firebase */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+
+            .controls-card, .actions-bar, .search-box, .btn-mic, .modal-overlay {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            .tasks-container, .info-card, header {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            .checkbox-cell input[type="checkbox"] {
+                appearance: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Formulaire de Vérification & Entretien</h1>
+        <p>Suivi et validation de l'ensemble des tâches d'entretien avec dictée vocale 🎙️ et sauvegarde/chargement Firebase 🔥</p>
+    </header>
+
+    <div class="info-card">
+        <div class="input-group">
+            <label for="date-select">Date</label>
+            <input type="date" id="date-select">
+        </div>
+        <div class="input-group">
+            <label for="worker-name">Nom de l'employé</label>
+            <div class="input-wrapper">
+                <input type="text" id="worker-name" placeholder="Ex: Jean Tremblay">
+                <button type="button" class="btn-mic" id="mic-worker-name" title="Dictée vocale">🎤</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="shift-select">Quart de travail</label>
+            <select id="shift-select">
+                <option value="">Tous les quarts</option>
+                <option value="Soir">Soir</option>
+                <option value="Nuit">Nuit</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="controls-card">
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-resp="all">Tous (58)</button>
+            <button class="filter-btn" data-resp="pab soir">PAB Soir (4)</button>
+            <button class="filter-btn" data-resp="pab nuit">PAB Nuit (7)</button>
+            <button class="filter-btn" data-resp="sam">SAM (5)</button>
+            <button class="filter-btn" data-resp="entretien soir">Entretien Soir (24)</button>
+            <button class="filter-btn" data-resp="entretien nuit">Entretien Nuit (18)</button>
+        </div>
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Rechercher une tâche...">
+        </div>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">0 / 58 (0%)</div>
+    </div>
+
+    <div class="tasks-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px; text-align: center;">Fait</th>
+                    <th style="width: 50px;">#</th>
+                    <th>Description de la Tâche</th>
+                    <th style="width: 160px;">Responsable</th>
+                    <th style="width: 280px;">Commentaires</th>
+                </tr>
+            </thead>
+            <tbody id="tasks-table-body">
+                <!-- Content injected by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions-bar">
+        <button class="btn btn-secondary" id="btn-reset">Réinitialiser</button>
+        <button class="btn btn-secondary" id="btn-print">Imprimer / PDF</button>
+        <button class="btn btn-accent" id="btn-load">Charger depuis Firebase 📂</button>
+        <button class="btn btn-primary" id="btn-save">Enregistrer dans Firebase 💾</button>
+    </div>
+</div>
+
+<!-- Modal de Recherche Firebase -->
+<div class="modal-overlay" id="search-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Rechercher une fiche enregistrée</h3>
+            <button class="modal-close" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="input-group">
+                <label for="search-date">Date</label>
+                <input type="date" id="search-date">
+            </div>
+            <div class="input-group">
+                <label for="search-name">Nom de l'employé</label>
+                <div class="input-wrapper">
+                    <input type="text" id="search-name" placeholder="Ex: Jean Tremblay">
+                    <button type="button" class="btn-mic" id="mic-search-name" title="Dictée vocale">🎤</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="btn-cancel-search">Annuler</button>
+            <button class="btn btn-accent" id="btn-exec-search">Rechercher 🔍</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyASNjEZ9tyR7VzHycAPJ65BeTuh6baOWYc",
+        authDomain: "alizea-26f19.firebaseapp.com",
+        projectId: "alizea-26f19",
+        storageBucket: "alizea-26f19.firebasestorage.app",
+        messagingSenderId: "274553836522",
+        appId: "1:274553836522:web:8271e290e1cbd41fb01893",
+        measurementId: "G-GFVWC7TWJ0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const tasksData = [
+        { id: 1, desc: "Nettoyer rampes et mains courantes sur tous les étages", resp: "pab soir" },
+        { id: 2, desc: "boutons ascenseurs, mur et arche (entrée) ascensseur + distributeur de désinfectant", resp: "pab soir" },
+        { id: 3, desc: "poignées porte et portes des chutes à déchets sur tous les étages", resp: "pab soir" },
+        { id: 4, desc: "comptoir réception", resp: "pab soir" },
+        { id: 5, desc: "Désinfecter boîte à colis", resp: "pab nuit" },
+        { id: 6, desc: "Époussetage + désinfection bibliothèque", resp: "pab nuit" },
+        { id: 7, desc: "Époussetage + désinfection salle de jeu", resp: "pab nuit" },
+        { id: 8, desc: "Désinfecter salle d'exercice", resp: "pab nuit" },
+        { id: 9, desc: "Nettoyer mobilier piscine", resp: "pab nuit" },
+        { id: 10, desc: "Désinfecter salle de golf", resp: "pab nuit" },
+        { id: 11, desc: "Laver rebord de fenêtres des corridors", resp: "pab nuit" },
+        { id: 12, desc: "Laver les mirroirs du buffet", resp: "sam" },
+        { id: 13, desc: "Nettoyer les comptoirs au fond de la salle à manger", resp: "sam" },
+        { id: 14, desc: "Nettoyer les tables ( sur et sous la vitre)", resp: "sam" },
+        { id: 15, desc: "Changer les centres de table", resp: "sam" },
+        { id: 16, desc: "Laver les comptoirs et entretenir le comptoir administratif en le gardant libre de tout effet personnel", resp: "sam" },
+        { id: 17, desc: "Sortir les conteneurs de recyclage (les lundis).", resp: "entretien soir" },
+        { id: 18, desc: "Sortir les conteneurs de vidanges (les mardis).", resp: "entretien soir" },
+        { id: 19, desc: "Faire les tests de piscine à tous les jours vers 15 h 30.", resp: "entretien soir" },
+        { id: 20, desc: "Faire tourner le recyclage sur les 6 étages au début et à la fin du quart.", resp: "entretien soir" },
+        { id: 21, desc: "Assurer que les robinets sont fermés sall entretien (RC et 4e)", resp: "entretien soir" },
+        { id: 22, desc: "Vérifier le compacteur à vidange.", resp: "entretien soir" },
+        { id: 23, desc: "Passer balai dans les corridors tous les étages(avant Zamboni)", resp: "entretien soir" },
+        { id: 24, desc: "Passer la zamboni sur les 6 étages dans les passages.", resp: "entretien soir" },
+        { id: 25, desc: "Nettoyer la salle des casse-têtes (plancher et époussetage).", resp: "entretien soir" },
+        { id: 26, desc: "Nettoyer la chapelle (plancher et époussetage).", resp: "entretien soir" },
+        { id: 27, desc: "Nettoyer le Cinema(epoussetage et balayeuse) et vider les poubelles", resp: "entretien soir" },
+        { id: 28, desc: "Nettoyer la Toilette (cinema) et vider poubelle", resp: "entretien soir" },
+        { id: 29, desc: "Nettoyer les bacs de recyclage bleus dans les cubicules à déchets.", resp: "entretien soir" },
+        { id: 30, desc: "Passer balai (balayeuse en hiver) entrée Ph1 et Ph2.", resp: "entretien soir" },
+        { id: 31, desc: "Nettoyer les dépôts sur chaque étage (une fois par semaine).", resp: "entretien soir" },
+        { id: 32, desc: "Nettoyer les planchers des salles d’entretien au minimum une fois par semaine et au besoin. Vérification des robinets (s’assurer qu’ils sont bien fermés)", resp: "entretien soir" },
+        { id: 33, desc: "Nettoyer le Golf (époussetage et balayeuse)", resp: "entretien soir" },
+        { id: 34, desc: "Nettoyer la salle communautaire et désinfecter les comptoirs.", resp: "entretien soir" },
+        { id: 35, desc: "Nettoyer et désinfecter les équipements de la salle de réception phase 2 (coin piano).", resp: "entretien soir" },
+        { id: 36, desc: "Faire le ménage de la salle de conférence de la phase 2.", resp: "entretien soir" },
+        { id: 37, desc: "Nettoyer la salle d’exercice : faire la moppe, désinfecter les appareils et s’assurer de bien nettoyer les miroirs.", resp: "entretien soir" },
+        { id: 38, desc: "Passer l’aspirateur dans la piscine (minimum une fois par semaine) et effectuer un backwash par la suite.", resp: "entretien soir" },
+        { id: 39, desc: "Signer les feuilles de vérification des équipements critiques (pompe, salle électrique, salle d’eau chaude et piscine).", resp: "entretien soir" },
+        { id: 40, desc: "Vérifier l’ensemble des portes de secours tous les soirs à 23 h 00 et s’assurer qu’elles sont bien barrées de l’extérieur.", resp: "entretien soir" },
+        { id: 41, desc: "Desinfecter les boutons d'ascensseur sur chacun des étages", resp: "entretien nuit" },
+        { id: 42, desc: "Signature des installations critiques (pompe, salle électrique, salle d’eau chaude et piscine fermée).", resp: "entretien nuit" },
+        { id: 43, desc: "Faire le balai et la moppe du plancher à la salle à manger.", resp: "entretien nuit" },
+        { id: 44, desc: "Nettoyer le bureau administratif et vider les poubelles.", resp: "entretien nuit" },
+        { id: 45, desc: "Nettoyer bureau de location et vider poubelle", resp: "entretien nuit" },
+        { id: 46, desc: "Salles des Soins: Passer l’aspirateur, laver les planchers et désinfecter les meubles", resp: "entretien nuit" },
+        { id: 47, desc: "Nettoyer bureau des Loisirs et vider poubelle", resp: "entretien nuit" },
+        { id: 48, desc: "Nettoyer bureau du Chef cuisinier et vider poubelle", resp: "entretien nuit" },
+        { id: 49, desc: "Nettoyer Billard et vider poubelle", resp: "entretien nuit" },
+        { id: 50, desc: "Nettoyer Salon cuisinier et vider poubelle", resp: "entretien nuit" },
+        { id: 51, desc: "Nettoyer Toilette 1 et 2 RC et vider poubelle", resp: "entretien nuit" },
+        { id: 52, desc: "Nettoyer la Bibliotheque, passer la balayeuse, enlever taches murs et portes.", resp: "entretien nuit" },
+        { id: 53, desc: "Faire la moppe dans les entrées de la phase 1, de la phase 2 et dans le secteur des boîtes aux lettres.", resp: "entretien nuit" },
+        { id: 54, desc: "Passer la moppe au sous-sol de la phase 1 (ascensseur et salon coiffure) et de la phase 2 ( devant ascensseur).", resp: "entretien nuit" },
+        { id: 55, desc: "Faire la moppe dans les ascenseurs, désinfecter les touches.", resp: "entretien nuit" },
+        { id: 56, desc: "Vérifier le compacteur à vidange et remplacer le bac au besoin.", resp: "entretien nuit" },
+        { id: 57, desc: "Désinfecter le plancher de la piscine et laver la douche (enlever les dépôts de calcaire sur la douche).", resp: "entretien nuit" },
+        { id: 58, desc: "Nettoyer Toilette 1 et 2 RC et vider poubelle", resp: "entretien nuit" }
+    ];
+
+    let activeFilter = 'all';
+    let currentRecognition = null;
+    let activeMicBtn = null;
+
+    document.getElementById('date-select').valueAsDate = new Date();
+
+    function getRespBadgeClass(resp) {
+        switch(resp) {
+            case 'pab soir': return 'resp-pab-soir';
+            case 'pab nuit': return 'resp-pab-nuit';
+            case 'sam': return 'resp-sam';
+            case 'entretien soir': return 'resp-entretien-soir';
+            case 'entretien nuit': return 'resp-entretien-nuit';
+            default: return '';
+        }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tasks-table-body');
+        tbody.innerHTML = '';
+
+        tasksData.forEach(task => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-id', task.id);
+            tr.setAttribute('data-resp', task.resp);
+
+            const isChecked = localStorage.getItem(`task_${task.id}`) === 'true';
+            const comment = localStorage.getItem(`comment_${task.id}`) || '';
+
+            tr.innerHTML = `
+                <td class="checkbox-cell">
+                    <input type="checkbox" id="chk_${task.id}" ${isChecked ? 'checked' : ''}>
+                </td>
+                <td style="font-weight: bold; color: var(--text-muted);">${task.id}</td>
+                <td class="task-desc ${isChecked ? 'task-done' : ''}">${task.desc}</td>
+                <td><span class="badge-resp ${getRespBadgeClass(task.resp)}">${task.resp}</span></td>
+                <td>
+                    <div class="comment-cell">
+                        <input type="text" id="comment_${task.id}" class="comment-input" value="${comment}" placeholder="Ajouter une note...">
+                        <button type="button" class="btn-mic mic-comment" data-input-id="comment_${task.id}" data-task-id="${task.id}" title="Dictée vocale">🎤</button>
+                    </div>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+
+            const chk = tr.querySelector(`#chk_${task.id}`);
+            chk.addEventListener('change', () => toggleTask(task.id));
+
+            const cInput = tr.querySelector(`#comment_${task.id}`);
+            cInput.addEventListener('change', (e) => saveComment(task.id, e.target.value));
+
+            const micBtn = tr.querySelector(`.mic-comment`);
+            micBtn.addEventListener('click', () => toggleDictation(`comment_${task.id}`, micBtn, task.id));
+        });
+
+        updateProgress();
+        filterTasks();
+    }
+
+    function toggleTask(id) {
+        const chk = document.getElementById(`chk_${id}`);
+        const tr = chk.closest('tr');
+        const descCell = tr.querySelector('.task-desc');
+
+        if (chk.checked) {
+            descCell.classList.add('task-done');
+            localStorage.setItem(`task_${id}`, 'true');
+        } else {
+            descCell.classList.remove('task-done');
+            localStorage.setItem(`task_${id}`, 'false');
+        }
+
+        updateProgress();
+    }
+
+    function saveComment(id, text) {
+        localStorage.setItem(`comment_${id}`, text);
+    }
+
+    function updateProgress() {
+        const total = tasksData.length;
+        let checkedCount = 0;
+        
+        tasksData.forEach(task => {
+            if (localStorage.getItem(`task_${task.id}`) === 'true') {
+                checkedCount++;
+            }
+        });
+
+        const percent = Math.round((checkedCount / total) * 100);
+        document.getElementById('progress-fill').style.width = percent + '%';
+        document.getElementById('progress-text').innerText = `${checkedCount} / ${total} (${percent}%)`;
+    }
+
+    function filterByResp(resp) {
+        activeFilter = resp;
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => {
+            if (btn.getAttribute('data-resp') === resp) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        filterTasks();
+    }
+
+    function filterTasks() {
+        const searchText = document.getElementById('search-input').value.toLowerCase();
+        const rows = document.querySelectorAll('#tasks-table-body tr');
+
+        rows.forEach(row => {
+            const resp = row.getAttribute('data-resp');
+            const desc = row.querySelector('.task-desc').innerText.toLowerCase();
+
+            const matchesResp = (activeFilter === 'all') || (resp === activeFilter);
+            const matchesSearch = desc.includes(searchText);
+
+            if (matchesResp && matchesSearch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function toggleDictation(inputId, btn, taskId = null) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            alert("Désolé, votre navigateur ne prend pas en charge la reconnaissance vocale.");
+            return;
+        }
+
+        if (currentRecognition) {
+            currentRecognition.stop();
+            if (activeMicBtn) activeMicBtn.classList.remove('recording');
+            if (activeMicBtn === btn) {
+                currentRecognition = null;
+                activeMicBtn = null;
+                return;
+            }
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'fr-FR';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        const inputField = document.getElementById(inputId);
+
+        recognition.onstart = function() {
+            btn.classList.add('recording');
+            activeMicBtn = btn;
+            currentRecognition = recognition;
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            if (inputField.value.trim() !== '') {
+                inputField.value += ' ' + transcript;
+            } else {
+                inputField.value = transcript;
+            }
+
+            if (taskId) {
+                saveComment(taskId, inputField.value);
+            }
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+            alert("Erreur de reconnaissance vocale : " + event.error);
+        };
+
+        recognition.onend = function() {
+            btn.classList.remove('recording');
+            currentRecognition = null;
+            activeMicBtn = null;
+        };
+
+        recognition.start();
+    }
+
+    // Attach Mic for Worker Name & Search Name
+    document.getElementById('mic-worker-name').addEventListener('click', function() {
+        toggleDictation('worker-name', this);
+    });
+
+    document.getElementById('mic-search-name').addEventListener('click', function() {
+        toggleDictation('search-name', this);
+    });
+
+    // Attach Filters
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            filterByResp(this.getAttribute('data-resp'));
+        });
+    });
+
+    // Attach Search Input
+    document.getElementById('search-input').addEventListener('keyup', filterTasks);
+
+    // Attach Reset Button
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        if (confirm("Voulez-vous vraiment réinitialiser toutes les cases cochées et commentaires ?")) {
+            tasksData.forEach(task => {
+                localStorage.removeItem(`task_${task.id}`);
+                localStorage.removeItem(`comment_${task.id}`);
+            });
+            renderTable();
+        }
+    });
+
+    // Attach Print Button
+    document.getElementById('btn-print').addEventListener('click', function() {
+        window.print();
+    });
+
+    // Modal Control Functions
+    const searchModal = document.getElementById('search-modal');
+    
+    function openModal() {
+        document.getElementById('search-date').value = document.getElementById('date-select').value;
+        document.getElementById('search-name').value = document.getElementById('worker-name').value;
+        searchModal.classList.add('active');
+    }
+
+    function closeModal() {
+        searchModal.classList.remove('active');
+    }
+
+    document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+    document.getElementById('btn-cancel-search').addEventListener('click', closeModal);
+
+    // Attach Save Button (Firebase Firestore)
+    document.getElementById('btn-save').addEventListener('click', async function() {
+        const btnSave = this;
+        const originalText = btnSave.innerHTML;
+
+        const employeeName = document.getElementById('worker-name').value.trim();
+        const date = document.getElementById('date-select').value;
+        const shift = document.getElementById('shift-select').value;
+
+        if (!employeeName) {
+            alert("Veuillez saisir ou dicter le nom de l'employé avant d'enregistrer.");
+            document.getElementById('worker-name').focus();
+            return;
+        }
+
+        if (!date) {
+            alert("Veuillez choisir une date avant d'enregistrer.");
+            return;
+        }
+
+        const tasksToSave = tasksData.map(task => {
+            const isCompleted = localStorage.getItem(`task_${task.id}`) === 'true';
+            const comment = localStorage.getItem(`comment_${task.id}`) || '';
+            return {
+                taskId: task.id,
+                description: task.desc,
+                responsable: task.resp,
+                completed: isCompleted,
+                comment: comment
+            };
+        });
+
+        const totalTasks = tasksData.length;
+        const completedTasksCount = tasksToSave.filter(t => t.completed).length;
+
+        const payload = {
+            employeeName: employeeName,
+            date: date,
+            shift: shift || "Non spécifié",
+            progress: {
+                completed: completedTasksCount,
+                total: totalTasks,
+                percentage: Math.round((completedTasksCount / totalTasks) * 100)
+            },
+            tasks: tasksToSave,
+            createdAt: serverTimestamp()
+        };
+
+        try {
+            btnSave.disabled = true;
+            btnSave.innerHTML = "Sauvegarde en cours... ⏳";
+
+            const docRef = await addDoc(collection(db, "fiches_entretien"), payload);
+            
+            alert(`✅ Sauvegarde réussie dans Firebase avec l'ID : ${docRef.id}`);
+        } catch (error) {
+            console.error("Erreur lors de la sauvegarde Firebase :", error);
+            alert("❌ Une erreur s'est produite lors de la sauvegarde : " + error.message);
+        } finally {
+            btnSave.disabled = false;
+            btnSave.innerHTML = originalText;
+        }
+    });
+
+    // Trigger Modal when clicking "Load from Firebase"
+    document.getElementById('btn-load').addEventListener('click', function() {
+        openModal();
+    });
+
+    // Execute Search in Modal
+    document.getElementById('btn-exec-search').addEventListener('click', async function() {
+        const btnSearch = this;
+        const originalText = btnSearch.innerHTML;
+
+        const employeeName = document.getElementById('search-name').value.trim();
+        const date = document.getElementById('search-date').value;
+
+        if (!employeeName || !date) {
+            alert("Veuillez renseigner le nom de l'employé ET la date pour exécuter la recherche.");
+            return;
+        }
+
+        try {
+            btnSearch.disabled = true;
+            btnSearch.innerHTML = "Recherche... ⏳";
+
+            const q = query(
+                collection(db, "fiches_entretien"),
+                where("employeeName", "==", employeeName),
+                where("date", "==", date),
+                orderBy("createdAt", "desc"),
+                limit(1)
+            );
+
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                alert(`ℹ️ Aucun formulaire trouvé pour "${employeeName}" à la date du ${date}.`);
+                return;
+            }
+
+            const docData = querySnapshot.docs[0].data();
+
+            // Synchro des champs de saisie principaux
+            document.getElementById('worker-name').value = docData.employeeName;
+            document.getElementById('date-select').value = docData.date;
+            if (docData.shift) {
+                document.getElementById('shift-select').value = docData.shift === "Non spécifié" ? "" : docData.shift;
+            }
+
+            if (docData.tasks && Array.isArray(docData.tasks)) {
+                docData.tasks.forEach(t => {
+                    localStorage.setItem(`task_${t.taskId}`, t.completed ? 'true' : 'false');
+                    localStorage.setItem(`comment_${t.taskId}`, t.comment || '');
+                });
+            }
+
+            renderTable();
+            closeModal();
+            alert(`✅ Formulaire chargé avec succès pour "${employeeName}" (${date}) !`);
+
+        } catch (error) {
+            console.error("Erreur lors du chargement depuis Firebase :", error);
+            alert("❌ Erreur lors de la récupération des données : " + error.message);
+        } finally {
+            btnSearch.disabled = false;
+            btnSearch.innerHTML = originalText;
+        }
+    });
+
+    renderTable();
+</script>
+
+</body>
+</html>
