@@ -42,14 +42,18 @@
             align-items: center;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
         h1 {
             color: var(--primary);
             font-size: 24px;
         }
 
-        .reset-btn {
-            background-color: #ef4444;
-            color: white;
+        .btn {
             border: none;
             padding: 8px 14px;
             border-radius: 6px;
@@ -57,6 +61,32 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-print {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .btn-print:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-print-secondary {
+            background-color: #475569;
+            color: white;
+        }
+
+        .btn-print-secondary:hover {
+            background-color: #334155;
+        }
+
+        .reset-btn {
+            background-color: #ef4444;
+            color: white;
         }
 
         .reset-btn:hover {
@@ -144,6 +174,15 @@
 
         .tab-content.active {
             display: block;
+        }
+
+        .print-section-title {
+            display: none;
+            font-size: 18px;
+            color: var(--primary);
+            margin: 20px 0 12px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border);
         }
 
         .search-box {
@@ -328,13 +367,106 @@
             background-color: #fff;
             box-shadow: 0 0 0 2px var(--primary-light);
         }
+
+        /* --- STYLES D'IMPRESSION --- */
+        @media print {
+            body {
+                padding: 0;
+                background-color: white;
+                color: black;
+            }
+
+            .header-actions,
+            .tabs,
+            .search-box,
+            .apt-card-form,
+            input[type="checkbox"] {
+                display: none !important;
+            }
+
+            header {
+                border-bottom: 2px solid #000;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+
+            .kpi-card {
+                border: 1px solid #ccc;
+                padding: 10px;
+                box-shadow: none;
+            }
+
+            /* Forcer l'affichage des onglets lors de l'impression globale */
+            body.print-all-active .tab-content {
+                display: block !important;
+                margin-bottom: 24px;
+            }
+
+            body.print-all-active .print-section-title {
+                display: block !important;
+            }
+
+            .apt-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .apt-card {
+                border: 1px solid #ccc !important;
+                padding: 8px 10px;
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+
+            .apt-card.done {
+                background-color: #f0fdf4 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .apt-card.todo {
+                background-color: #fff7ed !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            table {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            th, td {
+                padding: 8px 10px;
+                border-bottom: 1px solid #ccc;
+            }
+
+            .badge {
+                border: 1px solid #ccc;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
     </style>
 </head>
 <body>
 
     <header>
         <h1>Tableau de Bord — Suivi des Échangeurs d'Air</h1>
-        <button class="reset-btn" onclick="resetData()">Réinitialiser les données</button>
+        <div class="header-actions">
+            <button class="btn btn-print" onclick="printAllLists()">🖨️ Imprimer les 3 listes</button>
+            <button class="btn btn-print-secondary" onclick="printCurrentTab()">📄 Imprimer la vue courante</button>
+            <button class="btn reset-btn" onclick="resetData()">Réinitialiser</button>
+        </div>
     </header>
 
     <!-- Header Stats / KPIs -->
@@ -369,6 +501,7 @@
 
     <!-- Tab 1: Complete List -->
     <div id="tab-all" class="tab-content active">
+        <h2 class="print-section-title">1. Liste Complète des Appartements</h2>
         <div class="search-box">
             <input type="text" id="searchInput" class="search-input" placeholder="Rechercher un appartement, statut, technicien..." onkeyup="filterTable()">
         </div>
@@ -387,8 +520,11 @@
         </table>
     </div>
 
+    <div class="page-break"></div>
+
     <!-- Tab 2: Done List -->
     <div id="tab-done" class="tab-content">
+        <h2 class="print-section-title">2. Liste des Appartements Faits</h2>
         <div class="apt-grid" id="grid-done">
             <!-- Généré dynamiquement -->
         </div>
@@ -396,6 +532,7 @@
 
     <!-- Tab 3: Todo List -->
     <div id="tab-todo" class="tab-content">
+        <h2 class="print-section-title">3. Liste des Appartements À Faire</h2>
         <div class="apt-grid" id="grid-todo">
             <!-- Généré dynamiquement -->
         </div>
@@ -614,19 +751,16 @@
             return `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
         }
 
-        // Déclenché lorsqu'on coche un appartement dans "À faire"
         function onTodoCheck(aptId) {
             activeFormAptId = aptId;
             renderGrids();
         }
 
-        // Annuler la saisie
         function cancelTodoCheck() {
             activeFormAptId = null;
             renderGrids();
         }
 
-        // Enregistrer l'entretien complété
         function confirmTodoCheck(aptId) {
             const apt = apartments.find(a => a.id === aptId);
             if (apt) {
@@ -643,7 +777,6 @@
             }
         }
 
-        // Rétablir un appartement en "À Faire" depuis la liste "Faits"
         function markAsTodo(aptId) {
             const apt = apartments.find(a => a.id === aptId);
             if (apt) {
@@ -655,7 +788,6 @@
             }
         }
 
-        // Édition manuelle dans le tableau
         function updateCellText(aptId, field, value) {
             const apt = apartments.find(a => a.id === aptId);
             if (apt) {
@@ -802,6 +934,16 @@
                     tr[i].style.display = "none";
                 }
             }
+        }
+
+        function printAllLists() {
+            document.body.classList.add('print-all-active');
+            window.print();
+            document.body.classList.remove('print-all-active');
+        }
+
+        function printCurrentTab() {
+            window.print();
         }
 
         loadData();
