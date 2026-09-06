@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi A/C</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --warning: #ea580c;
+            --warning-bg: #ffedd5;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            padding: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-header {
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .print-btn {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .print-btn:hover {
+            background-color: var(--primary);
+        }
+
+        .reset-btn {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background-color: #dc2626;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+
+        .kpi-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 18px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-light);
+            border-bottom-color: var(--primary-light);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-box {
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 350px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background-color: var(--success-bg);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background-color: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .apt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .apt-card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .apt-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 15px;
+            transition: transform 0.1s ease;
+        }
+
+        .apt-card-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .apt-card input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-light);
+        }
+
+        .apt-card.done {
+            border-color: #86efac;
+            background-color: #f0fdf4;
+            color: #166534;
+        }
+
+        .apt-card.todo {
+            border-color: #fdba74;
+            background-color: #fff7ed;
+            color: #9a3412;
+        }
+
+        .apt-card-form {
+            background: #ffffff;
+            border: 1px solid var(--primary-light);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .apt-card-form label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .apt-card-form input {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .apt-card-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .btn-confirm {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background-color: #94a3b8;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .editable-cell {
+            outline: none;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .editable-cell:focus {
+            background-color: #fff;
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .print-section-title {
+            display: none;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 24px 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        /* --- STYLES D'IMPRESSION --- */
+        @media print {
+            body {
+                padding: 0;
+                background-color: white;
+                color: black;
+            }
+
+            .header-actions, .tabs, .search-box, .reset-btn, .print-btn, .apt-card-form {
+                display: none !important;
+            }
+
+            header {
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px;
+                margin-bottom: 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+                color: black;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                margin-bottom: 20px;
+                page-break-inside: avoid;
+            }
+
+            .kpi-card {
+                padding: 10px;
+                border: 1px solid #ccc;
+                box-shadow: none;
+            }
+
+            .kpi-value {
+                font-size: 20px;
+            }
+
+            /* Afficher le contenu de tous les onglets lors de l'impression */
+            .tab-content {
+                display: block !important;
+            }
+
+            .print-section-title {
+                display: block !important;
+                page-break-before: auto;
+            }
+
+            #tab-all {
+                page-break-after: always;
+            }
+
+            #tab-done {
+                page-break-after: always;
+            }
+
+            table {
+                box-shadow: none;
+                border: 1px solid #000;
+                width: 100%;
+            }
+
+            th, td {
+                padding: 6px 10px;
+                border: 1px solid #ccc;
+                color: black;
+            }
+
+            th {
+                background-color: #eee !important;
+                color: black;
+            }
+
+            .badge {
+                border: 1px solid #000;
+            }
+
+            .apt-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .apt-card {
+                border: 1px solid #ccc;
+                padding: 8px;
+                box-shadow: none;
+            }
+
+            .apt-card input[type="checkbox"] {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Tableau de Bord — Suivi A/C</h1>
+        <div class="header-actions">
+            <button class="btn-header print-btn" onclick="printAllLists()">
+                🖨️ Imprimer les 3 listes
+            </button>
+            <button class="btn-header reset-btn" onclick="resetData()">
+                Réinitialiser les données
+            </button>
+        </div>
+    </header>
+
+    <!-- Header Stats / KPIs -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-title">Total Appartements</div>
+            <div class="kpi-value" id="kpi-total">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Entretiens Effectués</div>
+            <div class="kpi-value" id="kpi-done" style="color: var(--success);">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Entretiens À Faire</div>
+            <div class="kpi-value" id="kpi-todo" style="color: var(--warning);">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Pourcentage Complété</div>
+            <div class="kpi-value" id="kpi-pct">0%</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="kpi-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('all')">Liste Complète (<span id="count-tab-all">0</span>)</button>
+        <button class="tab-btn" onclick="switchTab('done')">Appartements Faits (<span id="count-tab-done">0</span>)</button>
+        <button class="tab-btn" onclick="switchTab('todo')">Appartements À Faire (<span id="count-tab-todo">0</span>)</button>
+    </div>
+
+    <!-- Tab 1: Complete List -->
+    <div id="tab-all" class="tab-content active">
+        <h2 class="print-section-title">1. Liste Complète des Appartements</h2>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="Rechercher un appartement, statut, technicien..." onkeyup="filterTable()">
+        </div>
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th>Appartement</th>
+                    <th>Statut</th>
+                    <th>Date d'entretien</th>
+                    <th>Technicien / Intervenant</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Généré dynamiquement -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tab 2: Done List -->
+    <div id="tab-done" class="tab-content">
+        <h2 class="print-section-title">2. Liste des Appartements Faits</h2>
+        <div class="apt-grid" id="grid-done">
+            <!-- Généré dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Tab 3: Todo List -->
+    <div id="tab-todo" class="tab-content">
+        <h2 class="print-section-title">3. Liste des Appartements À Faire</h2>
+        <div class="apt-grid" id="grid-todo">
+            <!-- Généré dynamiquement -->
+        </div>
+    </div>
+
+    <script>
+        const rawData = [
+            { id: "117", done: false, date: "-", tech: "-" },
+            { id: "118", done: false, date: "-", tech: "-" },
+            { id: "119", done: false, date: "-", tech: "-" },
+            { id: "120", done: false, date: "-", tech: "-" },
+            { id: "121", done: false, date: "-", tech: "-" },
+            { id: "122", done: false, date: "-", tech: "-" },
+            { id: "123", done: false, date: "-", tech: "-" },
+            { id: "124", done: false, date: "-", tech: "-" },
+            { id: "153", done: false, date: "-", tech: "-" },
+            { id: "154", done: false, date: "-", tech: "-" },
+            { id: "201", done: false, date: "-", tech: "-" },
+            { id: "202", done: false, date: "-", tech: "-" },
+            { id: "203", done: false, date: "-", tech: "-" },
+            { id: "204", done: false, date: "-", tech: "-" },
+            { id: "205", done: false, date: "-", tech: "-" },
+            { id: "206", done: false, date: "-", tech: "-" },
+            { id: "207", done: false, date: "-", tech: "-" },
+            { id: "208", done: false, date: "-", tech: "-" },
+            { id: "209", done: false, date: "-", tech: "-" },
+            { id: "210", done: false, date: "-", tech: "-" },
+            { id: "211", done: false, date: "-", tech: "-" },
+            { id: "212", done: false, date: "-", tech: "-" },
+            { id: "214", done: false, date: "-", tech: "-" },
+            { id: "215", done: false, date: "-", tech: "-" },
+            { id: "216", done: false, date: "-", tech: "-" },
+            { id: "217", done: false, date: "-", tech: "-" },
+            { id: "218", done: false, date: "-", tech: "-" },
+            { id: "219", done: false, date: "-", tech: "-" },
+            { id: "220", done: false, date: "-", tech: "-" },
+            { id: "221/222", done: false, date: "-", tech: "-" },
+            { id: "223", done: false, date: "-", tech: "-" },
+            { id: "224", done: false, date: "-", tech: "-" },
+            { id: "225", done: false, date: "-", tech: "-" },
+            { id: "226", done: false, date: "-", tech: "-" },
+            { id: "227", done: false, date: "-", tech: "-" },
+            { id: "250", done: false, date: "-", tech: "-" },
+            { id: "251", done: false, date: "-", tech: "-" },
+            { id: "252", done: false, date: "-", tech: "-" },
+            { id: "253", done: false, date: "-", tech: "-" },
+            { id: "254", done: false, date: "-", tech: "-" },
+            { id: "255", done: false, date: "-", tech: "-" },
+            { id: "256", done: false, date: "-", tech: "-" },
+            { id: "257", done: false, date: "-", tech: "-" },
+            { id: "301", done: false, date: "-", tech: "-" },
+            { id: "302", done: false, date: "-", tech: "-" },
+            { id: "303", done: false, date: "-", tech: "-" },
+            { id: "304", done: false, date: "-", tech: "-" },
+            { id: "305", done: false, date: "-", tech: "-" },
+            { id: "306", done: false, date: "-", tech: "-" },
+            { id: "307", done: false, date: "-", tech: "-" },
+            { id: "308", done: false, date: "-", tech: "-" },
+            { id: "309", done: false, date: "-", tech: "-" },
+            { id: "310", done: false, date: "-", tech: "-" },
+            { id: "311", done: false, date: "-", tech: "-" },
+            { id: "312", done: false, date: "-", tech: "-" },
+            { id: "313", done: false, date: "-", tech: "-" },
+            { id: "314", done: false, date: "-", tech: "-" },
+            { id: "315/316", done: false, date: "-", tech: "-" },
+            { id: "317", done: false, date: "-", tech: "-" },
+            { id: "318", done: false, date: "-", tech: "-" },
+            { id: "319", done: false, date: "-", tech: "-" },
+            { id: "320", done: false, date: "-", tech: "-" },
+            { id: "321", done: false, date: "-", tech: "-" },
+            { id: "322", done: false, date: "-", tech: "-" },
+            { id: "323", done: false, date: "-", tech: "-" },
+            { id: "324", done: false, date: "-", tech: "-" },
+            { id: "325", done: false, date: "-", tech: "-" },
+            { id: "326", done: false, date: "-", tech: "-" },
+            { id: "327", done: false, date: "-", tech: "-" },
+            { id: "350", done: false, date: "-", tech: "-" },
+            { id: "351", done: false, date: "-", tech: "-" },
+            { id: "352", done: false, date: "-", tech: "-" },
+            { id: "353", done: false, date: "-", tech: "-" },
+            { id: "354", done: false, date: "-", tech: "-" },
+            { id: "355", done: false, date: "-", tech: "-" },
+            { id: "356", done: false, date: "-", tech: "-" },
+            { id: "357", done: false, date: "-", tech: "-" },
+            { id: "401", done: false, date: "-", tech: "-" },
+            { id: "402", done: false, date: "-", tech: "-" },
+            { id: "403", done: false, date: "-", tech: "-" },
+            { id: "404", done: false, date: "-", tech: "-" },
+            { id: "405", done: false, date: "-", tech: "-" },
+            { id: "406", done: false, date: "-", tech: "-" },
+            { id: "407", done: false, date: "-", tech: "-" },
+            { id: "408", done: false, date: "-", tech: "-" },
+            { id: "409", done: false, date: "-", tech: "-" },
+            { id: "410", done: false, date: "-", tech: "-" },
+            { id: "411", done: false, date: "-", tech: "-" },
+            { id: "412", done: false, date: "-", tech: "-" },
+            { id: "413", done: false, date: "-", tech: "-" },
+            { id: "414", done: false, date: "-", tech: "-" },
+            { id: "415", done: false, date: "-", tech: "-" },
+            { id: "416", done: false, date: "-", tech: "-" },
+            { id: "417", done: false, date: "-", tech: "-" },
+            { id: "418", done: false, date: "-", tech: "-" },
+            { id: "419", done: false, date: "-", tech: "-" },
+            { id: "420", done: false, date: "-", tech: "-" },
+            { id: "421", done: false, date: "-", tech: "-" },
+            { id: "422", done: false, date: "-", tech: "-" },
+            { id: "423", done: false, date: "-", tech: "-" },
+            { id: "424", done: false, date: "-", tech: "-" },
+            { id: "425", done: false, date: "-", tech: "-" },
+            { id: "426", done: false, date: "-", tech: "-" },
+            { id: "427", done: false, date: "-", tech: "-" },
+            { id: "450", done: false, date: "-", tech: "-" },
+            { id: "451", done: false, date: "-", tech: "-" },
+            { id: "452", done: false, date: "-", tech: "-" },
+            { id: "453", done: false, date: "-", tech: "-" },
+            { id: "454", done: false, date: "-", tech: "-" },
+            { id: "455", done: false, date: "-", tech: "-" },
+            { id: "456", done: false, date: "-", tech: "-" },
+            { id: "457", done: false, date: "-", tech: "-" },
+            { id: "501", done: false, date: "-", tech: "-" },
+            { id: "502", done: false, date: "-", tech: "-" },
+            { id: "503", done: false, date: "-", tech: "-" },
+            { id: "505", done: false, date: "-", tech: "-" },
+            { id: "506", done: false, date: "-", tech: "-" },
+            { id: "507", done: false, date: "-", tech: "-" },
+            { id: "508", done: false, date: "-", tech: "-" },
+            { id: "509", done: false, date: "-", tech: "-" },
+            { id: "510", done: false, date: "-", tech: "-" },
+            { id: "511", done: false, date: "-", tech: "-" },
+            { id: "512", done: false, date: "-", tech: "-" },
+            { id: "513", done: false, date: "-", tech: "-" },
+            { id: "514", done: false, date: "-", tech: "-" },
+            { id: "515", done: false, date: "-", tech: "-" },
+            { id: "516", done: false, date: "-", tech: "-" },
+            { id: "517", done: false, date: "-", tech: "-" },
+            { id: "518", done: false, date: "-", tech: "-" },
+            { id: "519", done: false, date: "-", tech: "-" },
+            { id: "520", done: false, date: "-", tech: "-" },
+            { id: "521", done: false, date: "-", tech: "-" },
+            { id: "522", done: false, date: "-", tech: "-" },
+            { id: "523", done: false, date: "-", tech: "-" },
+            { id: "525", done: false, date: "-", tech: "-" },
+            { id: "526", done: false, date: "-", tech: "-" },
+            { id: "527", done: false, date: "-", tech: "-" },
+            { id: "550", done: false, date: "-", tech: "-" },
+            { id: "551", done: false, date: "-", tech: "-" },
+            { id: "552", done: false, date: "-", tech: "-" },
+            { id: "553", done: false, date: "-", tech: "-" },
+            { id: "554", done: false, date: "-", tech: "-" },
+            { id: "555", done: false, date: "-", tech: "-" },
+            { id: "556", done: false, date: "-", tech: "-" },
+            { id: "557", done: false, date: "-", tech: "-" },
+            { id: "601", done: false, date: "-", tech: "-" },
+            { id: "602", done: false, date: "-", tech: "-" },
+            { id: "603", done: false, date: "-", tech: "-" },
+            { id: "605", done: false, date: "-", tech: "-" },
+            { id: "606", done: false, date: "-", tech: "-" },
+            { id: "607", done: false, date: "-", tech: "-" },
+            { id: "608", done: false, date: "-", tech: "-" },
+            { id: "609", done: false, date: "-", tech: "-" },
+            { id: "610", done: false, date: "-", tech: "-" },
+            { id: "611", done: false, date: "-", tech: "-" },
+            { id: "612", done: false, date: "-", tech: "-" },
+            { id: "613", done: false, date: "-", tech: "-" },
+            { id: "614", done: false, date: "-", tech: "-" },
+            { id: "615", done: false, date: "-", tech: "-" },
+            { id: "616", done: false, date: "-", tech: "-" },
+            { id: "617", done: false, date: "-", tech: "-" },
+            { id: "618", done: false, date: "-", tech: "-" },
+            { id: "619", done: false, date: "-", tech: "-" },
+            { id: "620", done: false, date: "-", tech: "-" },
+            { id: "621", done: false, date: "-", tech: "-" },
+            { id: "622", done: false, date: "-", tech: "-" },
+            { id: "623", done: false, date: "-", tech: "-" },
+            { id: "625", done: false, date: "-", tech: "-" },
+            { id: "626", done: false, date: "-", tech: "-" },
+            { id: "627", done: false, date: "-", tech: "-" },
+            { id: "650", done: false, date: "-", tech: "-" },
+            { id: "651", done: false, date: "-", tech: "-" },
+            { id: "652", done: false, date: "-", tech: "-" },
+            { id: "653", done: false, date: "-", tech: "-" },
+            { id: "654", done: false, date: "-", tech: "-" },
+            { id: "655", done: false, date: "-", tech: "-" },
+            { id: "656", done: false, date: "-", tech: "-" },
+            { id: "657", done: false, date: "-", tech: "-" }
+        ];
+
+        let apartments = [];
+        let activeFormAptId = null;
+
+        function loadData() {
+            const saved = localStorage.getItem('suivi_ac_data');
+            if (saved) {
+                apartments = JSON.parse(saved);
+            } else {
+                apartments = JSON.parse(JSON.stringify(rawData));
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('suivi_ac_data', JSON.stringify(apartments));
+        }
+
+        function resetData() {
+            if (confirm("Voulez-vous réinitialiser toutes les données aux valeurs d'origine ?")) {
+                localStorage.removeItem('suivi_ac_data');
+                loadData();
+                activeFormAptId = null;
+                renderAll();
+            }
+        }
+
+        function getTodayFormatted() {
+            const today = new Date();
+            const months = ["Jan", "Fév", "Mars", "Avril", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
+            return `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
+        }
+
+        function onTodoCheck(aptId) {
+            activeFormAptId = aptId;
+            renderGrids();
+        }
+
+        function cancelTodoCheck() {
+            activeFormAptId = null;
+            renderGrids();
+        }
+
+        function confirmTodoCheck(aptId) {
+            const apt = apartments.find(a => a.id === aptId);
+            if (apt) {
+                const dateVal = document.getElementById(`input-date-${aptId}`).value.trim();
+                const techVal = document.getElementById(`input-tech-${aptId}`).value.trim();
+
+                apt.done = true;
+                apt.date = dateVal !== '' ? dateVal : getTodayFormatted();
+                apt.tech = techVal !== '' ? techVal : 'Inconnu';
+
+                activeFormAptId = null;
+                saveData();
+                renderAll();
+            }
+        }
+
+        function markAsTodo(aptId) {
+            const apt = apartments.find(a => a.id === aptId);
+            if (apt) {
+                apt.done = false;
+                apt.date = '-';
+                apt.tech = '-';
+                saveData();
+                renderAll();
+            }
+        }
+
+        function updateCellText(aptId, field, value) {
+            const apt = apartments.find(a => a.id === aptId);
+            if (apt) {
+                apt[field] = value.trim() === '' ? '-' : value.trim();
+                saveData();
+                renderGrids();
+            }
+        }
+
+        function updateKPIs() {
+            const total = apartments.length;
+            const doneCount = apartments.filter(a => a.done).length;
+            const todoCount = total - doneCount;
+            const pct = total > 0 ? ((doneCount / total) * 100).toFixed(1) : 0;
+
+            document.getElementById('kpi-total').textContent = total;
+            document.getElementById('kpi-done').textContent = doneCount;
+            document.getElementById('kpi-todo').textContent = todoCount;
+            document.getElementById('kpi-pct').textContent = pct + '%';
+            document.getElementById('kpi-bar').style.width = pct + '%';
+
+            document.getElementById('count-tab-all').textContent = total;
+            document.getElementById('count-tab-done').textContent = doneCount;
+            document.getElementById('count-tab-todo').textContent = todoCount;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            apartments.forEach(apt => {
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td><strong>${apt.id}</strong></td>
+                    <td>
+                        <span class="badge ${apt.done ? 'badge-success' : 'badge-warning'}">
+                            ${apt.done ? 'Effectué' : 'À faire'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="editable-cell" contenteditable="true" onblur="updateCellText('${apt.id}', 'date', this.innerText)">${apt.date}</span>
+                    </td>
+                    <td>
+                        <span class="editable-cell" contenteditable="true" onblur="updateCellText('${apt.id}', 'tech', this.innerText)">${apt.tech}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            filterTable();
+        }
+
+        function renderGrids() {
+            const gridDone = document.getElementById('grid-done');
+            const gridTodo = document.getElementById('grid-todo');
+
+            gridDone.innerHTML = '';
+            gridTodo.innerHTML = '';
+
+            const defaultDate = getTodayFormatted();
+
+            apartments.forEach(apt => {
+                const container = document.createElement('div');
+                container.className = 'apt-card-container';
+
+                if (apt.done) {
+                    container.innerHTML = `
+                        <div class="apt-card done">
+                            <div class="apt-card-left">
+                                <input type="checkbox" checked onchange="markAsTodo('${apt.id}')" title="Décocher pour remettre à faire">
+                                <span>Apt ${apt.id}</span>
+                            </div>
+                            <span style="font-size: 12px; font-weight: normal; color: #15803d;">${apt.tech} (${apt.date})</span>
+                        </div>
+                    `;
+                    gridDone.appendChild(container);
+                } else {
+                    const isFormOpen = activeFormAptId === apt.id;
+
+                    container.innerHTML = `
+                        <div class="apt-card todo">
+                            <div class="apt-card-left">
+                                <input type="checkbox" ${isFormOpen ? 'checked' : ''} onchange="onTodoCheck('${apt.id}')">
+                                <span>Apt ${apt.id}</span>
+                            </div>
+                            <span style="font-size: 12px; font-weight: normal; color: #c2410c;">À faire</span>
+                        </div>
+                        ${isFormOpen ? `
+                            <div class="apt-card-form">
+                                <div>
+                                    <label>Date d'entretien :</label>
+                                    <input type="text" id="input-date-${apt.id}" value="${defaultDate}" style="width:100%;">
+                                </div>
+                                <div>
+                                    <label>Technicien / Intervenant :</label>
+                                    <input type="text" id="input-tech-${apt.id}" placeholder="Ex: Maxim, Denis, Julien..." style="width:100%;" autofocus>
+                                </div>
+                                <div class="apt-card-form-actions">
+                                    <button class="btn-cancel" onclick="cancelTodoCheck()">Annuler</button>
+                                    <button class="btn-confirm" onclick="confirmTodoCheck('${apt.id}')">Enregistrer</button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                    gridTodo.appendChild(container);
+                }
+            });
+        }
+
+        function renderAll() {
+            updateKPIs();
+            renderTable();
+            renderGrids();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'all') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-all').classList.add('active');
+            } else if (tabName === 'done') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-done').classList.add('active');
+            } else if (tabName === 'todo') {
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.getElementById('tab-todo').classList.add('active');
+            }
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('mainTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                let text = tr[i].textContent.toLowerCase();
+                if (text.indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+
+        function printAllLists() {
+            window.print();
+        }
+
+        loadData();
+        renderAll();
+    </script>
+</body>
+</html>
