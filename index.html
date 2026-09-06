@@ -139,6 +139,7 @@ button:hover,a.menu-btn:hover{background:#005ea6}
 <a id="btn-fin" class="menu-btn" href="Fin.html">Fin quart</a>
 <a id="btn-audit" class="menu-btn" href="audit.html">Audit</a>
 <a id="btn-echangeur" class="menu-btn" href="echangeurs.html">Échangeur</a>
+<a id="btn-ac" class="menu-btn" href="ac.html">A/C</a>
 <button class="back" onclick="showMenu('mainMenu')">Retour</button>
 </div>
 
@@ -367,6 +368,8 @@ if (SpeechRecognition) {
       document.getElementById('btn-audit').click();
     } else if (transcript.includes('échangeur') || transcript.includes('echangeur') || transcript.includes('air')) {
       document.getElementById('btn-echangeur').click();
+    } else if (transcript.includes('a/c') || transcript.includes('ac') || transcript.includes('climatisation')) {
+      document.getElementById('btn-ac').click();
     }
 
     // Cuisine
